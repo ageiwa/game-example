@@ -1,11 +1,14 @@
 import Phaser from 'phaser'
-import { arenaRender } from '../systems/arenaRender'
-import { selectingHero } from '../systems/selectingHero'
-import { textRender } from '../systems/textRender'
-import { createArena } from '../entities/arena'
-import { createHero } from '../entities/hero'
-import { createText } from '../entities/text'
-import { HEIGHT, WIDTH } from '../utils/constants'
+import { arenaRender } from '@/systems/arenaRender'
+import { selectingHero } from '@/systems/selectingHero'
+import { textRender } from '@/systems/textRender'
+import { setHeroOnArena } from '@/systems/setHeroOnArena'
+import { heroRender } from '@/systems/heroRender'
+import { createArena, madeArenaSlots } from '@/entities/Arena/lib'
+import { createHero } from '@/entities/Hero/lib'
+import { heroStore } from '@/entities/Hero/model'
+import { createText } from '@/entities/text'
+import { HEIGHT, WIDTH } from '@/utils/constants'
 
 const field = new Phaser.Scene('field')
 
@@ -28,6 +31,8 @@ function createField() {
     arena.x = 0
     arena.y = 0
 
+    madeArenaSlots(arena)
+
     const myArena = createArena()
     myArena.horizontalCellCount = horizontalCells
     myArena.verticalCellCount = verticalCells
@@ -36,10 +41,9 @@ function createField() {
     myArena.x = 0
     myArena.y = HEIGHT - (cellHeight * verticalCells)
 
-    arenaRender(field, [
-        arena,
-        myArena
-    ])
+    madeArenaSlots(myArena)
+
+    arenaRender(field, [ arena, myArena ])
 
     const title = createText()
     title.x = WIDTH / 2
@@ -47,6 +51,8 @@ function createField() {
     title.fontSize = 24
     title.value = 'Выберите героя'
     title.color = '#fff'
+
+    textRender(field, [ title ])
 
     const red = createHero()
     red.color = 0xff0000
@@ -63,19 +69,13 @@ function createField() {
     green.width = 50
     green.height = 50
 
-    textRender(field, [
-        title
-    ])
+    selectingHero(field, [ red, blue, green ])
 
-    selectingHero(field, [
-        red,
-        blue,
-        green
-    ])
+    setHeroOnArena(field, myArena, [ red, blue, green ])
 }
 
 function updateField() {
-
+    heroRender(field, heroStore.myHeroes)
 }
 
 export { field }

@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
-import { Hero, selectHero } from '../entities/hero'
-import { WIDTH, HEIGHT } from '../utils/constants'
+import { selectHero } from '@/entities/Hero/model'
+import { Hero } from '@/entities/Hero/types'
+import { WIDTH, HEIGHT } from '@/utils/constants'
 
 export function selectingHero(scene: Phaser.Scene, heroes: Hero[]) {
     const SPACE_WIDTH = (WIDTH / 3)
@@ -17,7 +18,7 @@ export function selectingHero(scene: Phaser.Scene, heroes: Hero[]) {
         hero.sprite = scene.add.rectangle(hero.x, hero.y, hero.width, hero.height, hero.color)
         
         hero.sprite.setOrigin(0, 0)
-        hero.sprite.setInteractive()
+        hero.sprite.setInteractive({ draggable: true })
 
         hero.sprite.on('pointerover', () => {
             hero.sprite?.setX(hero.x - 5)
@@ -33,7 +34,10 @@ export function selectingHero(scene: Phaser.Scene, heroes: Hero[]) {
 
         hero.sprite.on('pointerdown', () => {
             selectHero(hero.color)
-            // scene.scene.remove()
+        })
+
+        scene.input.on('drag', (_: Phaser.Input.Pointer, gObj: Phaser.GameObjects.Rectangle, x: number, y: number) => {
+            gObj.setPosition(x, y)
         })
     })
 }
